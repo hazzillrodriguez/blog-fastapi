@@ -5,15 +5,15 @@ from typing import Optional, List
 from ..database import get_db
 from .. import models, schemas, oauth2
 
-router = APIRouter()
+router = APIRouter(prefix='/posts', tags=['Post'])
 
-@router.get('/posts', response_model=List[schemas.Post])
+@router.get('/', response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ''):
     """ Get all posts """
     posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
-@router.post('/posts', status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_post(post: schemas.CreatePost, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     """ Create new post """
     new_post = models.Post(user_id=current_user.id, **post.dict())
@@ -22,7 +22,7 @@ def create_post(post: schemas.CreatePost, db: Session = Depends(get_db), current
     db.refresh(new_post)
     return new_post
 
-@router.get('/post/{id}', response_model=schemas.Post)
+@router.get('/{id}', response_model=schemas.Post)
 def get_post(id: int, db: Session = Depends(get_db)):
     """ Get post by id """
     post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -31,7 +31,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
             detail=f'Post with id: {id} was not found!')
     return post
 
-@router.delete('/post/{id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     """ Delete post by id """
     post = db.query(models.Post).filter(models.Post.id == id)
@@ -47,7 +47,7 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.put('/post/{id}', response_model=schemas.Post)
+@router.put('/{id}', response_model=schemas.Post)
 def update_post(id: int, post: schemas.CreatePost, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     """ Update post by id """
     post_query = db.query(models.Post).filter(models.Post.id == id)

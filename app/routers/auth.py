@@ -5,7 +5,7 @@ from .. import schemas, models, oauth2
 from ..database import get_db
 from ..utils.password import verify_password
 
-router = APIRouter()
+router = APIRouter(tags=['Auth'])
 
 @router.post('/login')
 def login(login: schemas.Login, db: Session = Depends(get_db)):
