@@ -29,6 +29,13 @@ class Post(PostBase):
     class Config:
         orm_mode = True
 
+class PostVote(BaseModel):
+    Post: Post
+    votes: int
+
+    class Config:
+        orm_mode = True
+
 class CreatePost(PostBase):
     pass
 
