@@ -8,7 +8,7 @@ from ..utils.password import verify_password
 
 router = APIRouter(tags=['Auth'])
 
-@router.post('/login')
+@router.post('/login', response_model=schemas.Token)
 def login(login: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == login.username).first()
     if not user:
